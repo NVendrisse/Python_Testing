@@ -1,5 +1,11 @@
 import json
-from utils import ClubNotFoundError, get_club
+from utils import (
+    ClubNotFoundError,
+    CompetitionNotFoundError,
+    get_club_by_email,
+    get_club_by_name,
+    get_competition,
+)
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 
@@ -31,7 +37,7 @@ def index():
 @app.route("/showSummary", methods=["POST"])
 def showSummary():
     try:
-        club = get_club(clubs, str(request.form["email"]))
+        club = get_club_by_email(clubs, str(request.form["email"]))
     except ClubNotFoundError:
         flash(
             "This account doesn't exist, please make sure that you enterred your email properly"
@@ -41,16 +47,17 @@ def showSummary():
 
 
 @app.route("/book/<competition>/<club>")
-def book(competition, club):
-    foundClub = [c for c in clubs if c["name"] == club][0]
-    foundCompetition = [c for c in competitions if c["name"] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition
-        )
-    else:
-        flash("Something went wrong-please try again")
-        return render_template("welcome.html", club=club, competitions=competitions)
+def book(competition: str, club: str):
+    try:
+        foundClub = get_club_by_name(clubs, club)
+        foundCompetition = get_competition(competitions, competition)
+    except ClubNotFoundError:
+        flash("The requested club was not found, please connect again")
+        return redirect(url_for("index"))
+    except CompetitionNotFoundError:
+        flash("The requested competition was not found, please connect and try again")
+        return redirect(url_for("index"))
+    return render_template("booking.html", club=foundClub, competition=foundCompetition)
 
 
 @app.route("/purchasePlaces", methods=["POST"])
