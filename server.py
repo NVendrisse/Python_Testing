@@ -2,9 +2,11 @@ import json
 from utils import (
     ClubNotFoundError,
     CompetitionNotFoundError,
+    PurchaseError,
     get_club_by_email,
     get_club_by_name,
     get_competition,
+    purchase_places,
 )
 from flask import Flask, render_template, request, redirect, flash, url_for
 
@@ -62,14 +64,23 @@ def book(competition: str, club: str):
 
 @app.route("/purchasePlaces", methods=["POST"])
 def purchasePlaces():
-    competition = [c for c in competitions if c["name"] == request.form["competition"]][
-        0
-    ]
-    club = [c for c in clubs if c["name"] == request.form["club"]][0]
-    placesRequired = int(request.form["places"])
-    competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - placesRequired
-    flash("Great booking complete!")
-    return render_template("welcome.html", club=club, competitions=competitions)
+    try:
+        club = get_club_by_name(clubs, request.form["club"])
+        competition = get_competition(competitions, request.form["competition"])
+        purchase_places(club, competition, int(request.form["places"]))
+        flash("Great booking complete!")
+        return render_template("welcome.html", club=club, competitions=competitions)
+    except ClubNotFoundError:
+        flash("The requested club was not found, please connect again")
+        return redirect(url_for("index"))
+    except CompetitionNotFoundError:
+        flash("The requested competition was not found, please try again")
+        return render_template("welcome.html", club=club, competitions=competitions)
+    except PurchaseError:
+        flash(
+            "Oops! Something wrong happened, maybe you don't have enought points, or ask for too much places, please try again"
+        )
+        return render_template("welcome.html", club=club, competitions=competitions)
 
 
 # TODO: Add route for points display
