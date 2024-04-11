@@ -1,0 +1,46 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clubs points</title>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+
+        }
+
+        tr:nth-child(2n) {
+            background-color: #eeeeee;
+        }
+    </style>
+</head>
+
+<header>
+    <h1>Clubs points</h1>
+</header>
+
+<body>
+    <p>Here you can find all the available points for each club</p>
+    <table>
+        <tr>
+            <th>Club name</th>
+            <th>Points available</th>
+        </tr>
+        {% for club in clubs %}
+        <tr>
+            <td>{{club['name']}}</td>
+            <td>{{club['points']}}</td>
+        </tr>
+        {%endfor%}
+    </table>
+</body>
+<footer>
+    <a href="{{url_for('index')}}">Go to the login page</a>
+</footer>
+
+</html>
