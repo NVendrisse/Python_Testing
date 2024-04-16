@@ -78,7 +78,7 @@ def purchasePlaces():
         return render_template("welcome.html", club=club, competitions=competitions)
     except PurchaseError:
         flash(
-            "Oops! Something wrong happened, maybe you don't have enought points, or ask for too much places (ttt), please try again"
+            "Oops! Something wrong happened, maybe you don't have enought points, or ask for too much places (12 max), please try again"
         )
         return render_template("welcome.html", club=club, competitions=competitions)
 
