@@ -28,7 +28,10 @@ def test_purchase_invalid_club(client, monkeypatch, competition_fixture, club_fi
 
 
 def test_purchase_invalid_competition(
-    client, monkeypatch, competition_fixture, club_fixture
+    client,
+    monkeypatch,
+    competition_fixture,
+    club_fixture,
 ):
     monkeypatch.setattr(server, "clubs", club_fixture)
     monkeypatch.setattr(server, "competitions", competition_fixture)

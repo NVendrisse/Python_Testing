@@ -38,7 +38,7 @@ def purchase_places(club, competition, quantity: int):
     if (
         quantity <= 0
         or quantity > int(club["points"])
-        or quantity > 12
+        or quantity >= 12
         or quantity > int(competition["numberOfPlaces"])
     ):
         raise PurchaseError
