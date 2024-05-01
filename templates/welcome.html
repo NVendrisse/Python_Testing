@@ -1,19 +1,21 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary | GUDLFT Registration</title>
 </head>
+
 <body>
-        <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
+    <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
 
     {% with messages = get_flashed_messages()%}
     {% if messages %}
-        <ul>
-       {% for message in messages %}
-            <li>{{message}}</li>
+    <ul>
+        {% for message in messages %}
+        <li>{{message}}</li>
         {% endfor %}
-       </ul>
+    </ul>
     {% endif%}
     Points available: {{club['points']}}
     <h3>Competitions:</h3>
@@ -24,7 +26,11 @@
             Date: {{comp['date']}}</br>
             Number of Places: {{comp['numberOfPlaces']}}
             {%if comp['numberOfPlaces']|int >0%}
+            {%if comp['is_over']%}
+            <p>This competition is over</p>
+            {%else%}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
+            {%endif%}
             {%endif%}
         </li>
         <hr />
@@ -33,4 +39,5 @@
     {%endwith%}
 
 </body>
+
 </html>

@@ -7,6 +7,8 @@ from utils import (
     get_club_by_name,
     get_competition,
     purchase_places,
+    maximum_purchasable_places,
+    date_checker,
 )
 from flask import Flask, render_template, request, redirect, flash, url_for
 
@@ -20,6 +22,8 @@ def loadClubs():
 def loadCompetitions():
     with open("competitions.json") as comps:
         listOfCompetitions = json.load(comps)["competitions"]
+        for competition in listOfCompetitions:
+            date_checker(competition)
         return listOfCompetitions
 
 
@@ -53,13 +57,24 @@ def book(competition: str, club: str):
     try:
         foundClub = get_club_by_name(clubs, club)
         foundCompetition = get_competition(competitions, competition)
+        maximum_available_places = maximum_purchasable_places(
+            foundClub, foundCompetition
+        )
     except ClubNotFoundError:
         flash("The requested club was not found, please connect again")
         return redirect(url_for("index"))
     except CompetitionNotFoundError:
-        flash("The requested competition was not found, please connect and try again")
-        return redirect(url_for("index"))
-    return render_template("booking.html", club=foundClub, competition=foundCompetition)
+        flash("The requested competition was not found, please try again")
+        return render_template(
+            "welcome.html", club=foundClub, competitions=competitions
+        )
+
+    return render_template(
+        "booking.html",
+        club=foundClub,
+        competition=foundCompetition,
+        maximum=maximum_available_places,
+    )
 
 
 @app.route("/purchasePlaces", methods=["POST"])
@@ -81,6 +96,14 @@ def purchasePlaces():
             "Oops! Something wrong happened, maybe you don't have enought points, or ask for too much places (12 max), please try again"
         )
         return render_template("welcome.html", club=club, competitions=competitions)
+    except ValueError:
+        maximum_available_places = maximum_purchasable_places(club, competition)
+        return render_template(
+            "booking.html",
+            club=club,
+            competition=competition,
+            maximum=maximum_available_places,
+        )
 
 
 @app.route("/points-display")
