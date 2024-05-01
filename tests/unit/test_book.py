@@ -40,7 +40,4 @@ def test_book_invalid_competiton(
     response = client.get("/book/Pomme/Iron%20Temple")
     page_data = response.data.decode()
     assert response.status_code == 200
-    assert (
-        "The requested competition was not found, please connect and try again"
-        in page_data
-    )
+    assert "The requested competition was not found, please try again" in page_data
